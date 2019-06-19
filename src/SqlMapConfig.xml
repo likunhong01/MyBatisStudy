@@ -23,11 +23,16 @@
             <transactionManager type="JDBC"></transactionManager>
             <!-- 配置数据源，采用dbcp连接池 -->
             <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.jdbc.Driver"/>
+<!--                <property name="driver" value="com.mysql.jdbc.Driver"/>-->
+<!--&lt;!&ndash;                数据库名称&ndash;&gt;-->
+<!--                <property name="url" value="jdbc:mysql://localhost:3306/mybatis_study?useUnicode=true&amp;characterEncoding=utf8"/>-->
+<!--                <property name="username" value="root"/>-->
+<!--                <property name="password" value="123456"/>-->
+                <property name="driver" value="${driverClass}"/>
 <!--                数据库名称-->
-                <property name="url" value="jdbc:mysql://localhost:3306/mybatis_study?useUnicode=true&amp;characterEncoding=utf8"/>
-                <property name="username" value="root"/>
-                <property name="password" value="123456"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${name}"/>
+                <property name="password" value="${password}"/>
             </dataSource>
         </environment>
     </environments>
