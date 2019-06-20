@@ -1,13 +1,24 @@
 package com.vo;
 
-import com.model.Order;
+import com.model.Orders;
 import com.model.User;
 
-public class UserQueryVO {
+import java.util.List;
 
+public class UserQueryVO {
     private User user;
 
-    private Order order;
+    private List<Integer> ids;
+
+    public List<Integer> getIds() {
+        return ids;
+    }
+
+    public void setIds(List<Integer> ids) {
+        this.ids = ids;
+    }
+
+    private Orders order;
     public User getUser() {
         return user;
     }
@@ -16,11 +27,12 @@ public class UserQueryVO {
         this.user = user;
     }
 
-    public Order getOrder() {
+    public Orders getOrder() {
         return order;
     }
 
-    public void setOrder(Order order) {
+    public void setOrder(Orders order) {
         this.order = order;
     }
+
 }

@@ -6,7 +6,10 @@
 
     <properties resource="db.properties"/>
 
-
+    <!--配置懒加载-->
+    <settings>
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
     <!--配置别名-->
     <typeAliases>
         <!--<typeAlias type="com.model.User" alias="user"></typeAlias>-->

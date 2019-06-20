@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyf.mapper.OrderMapper">
+
+    <select id="findOrderById" parameterType="int" resultType="ordersExt">
+        SELECT
+            o.*,u.username,u.address
+        FROM
+            orders o,user u
+        WHERE
+            o.user_id = u.id
+            AND o.id = #{id}
+    </select>
+
+    <!-- =============== 一对一 =================-->
+    <!--如果模型里有模型，使用resultMap-->
+    <resultMap id="orderRslMap" type="orders">
+        <!-- 往orders的模型匹配数据-->
+        <id column="id" property="id"></id>
+        <id column="note" property="note"></id>
+        <id column="number" property="number"></id>
+        <id column="createtime" property="createtime"></id>
+
+        <!-- 往orders的user匹配数据
+         模型里有模型，使用association来配置-->
+        <association property="user" javaType="user">
+            <id column="user_id" property="id"></id>
+            <id column="username" property="username"></id>
+            <id column="address" property="address"></id>
+        </association>
+    </resultMap>
+
+    <select id="findOrderById2" parameterType="int" resultMap="orderRslMap">
+        SELECT
+        o.*,u.username,u.address
+        FROM
+        orders o,user u
+        WHERE
+        o.user_id = u.id
+        AND o.id = #{id}
+    </select>
+
+
+
+    <!--  ================一对多==================-->
+    <resultMap id="orderRslMap3" type="orders">
+        <!-- 往orders的模型匹配数据-->
+        <id column="id" property="id"></id>
+        <id column="note" property="note"></id>
+        <id column="number" property="number"></id>
+        <id column="createtime" property="createtime"></id>
+
+        <!-- 往orders的user匹配数据
+         模型里有模型，使用association来配置-->
+        <association property="user" javaType="user">
+            <id column="user_id" property="id"></id>
+            <id column="username" property="username"></id>
+            <id column="address" property="address"></id>
+        </association>
+        
+        <!-- 一对多匹配： 往orders的orderdetails 匹配数据
+        注意：集合里类型使用ofType,而不javaType
+        -->
+        <collection property="orderDetails" ofType="orderDetail">
+            <id column="detail_id" property="id"></id>
+            <id column="items_id" property="itemsId"></id>
+            <id column="items_num" property="itemsNum"></id>
+        </collection>
+    </resultMap>
+
+
+    <select id="findOrderById3" parameterType="int" resultMap="orderRslMap3">
+       SELECT
+            o.*,
+            u.username,
+            u.address,
+            od.id detail_id,
+          od.items_id,
+          od.items_num
+        FROM
+            orders o,
+            user u,
+            orderdetail od
+        WHERE
+            o.user_id = u.id
+          AND o.id = od.orders_id
+            AND o.id = #{id}
+    </select>
+
+
+
+    <!--  ============= 懒加载 ==================-->
+    <resultMap id="orderLazyloadingRslMap" type="orders">
+        <id column="id" property="id"/>
+        <result column="note" property="note"/>
+        <result column="number" property="number"/>
+        <result column="createtime" property="createtime"/>
+
+        <!--配置查询-->
+        <association property="user" select="com.gyf.mapper.UserMapper.findUserById" column="user_id"/>
+    </resultMap>
+    <select id="findOrderAndUserByLazyloading" resultMap="orderLazyloadingRslMap">
+        SELECT * FROM orders
+    </select>
+</mapper>

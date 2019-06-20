@@ -2,6 +2,7 @@ package com.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 public class User implements Serializable {
@@ -10,6 +11,17 @@ public class User implements Serializable {
 	private String sex;// 性别
 	private Date birthday;// 生日
 	private String address;// 地址
+
+	private List<Orders> orderList;//一个用户有多张定单
+
+	public List<Orders> getOrderList() {
+		return orderList;
+	}
+
+	public void setOrderList(List<Orders> orderList) {
+		this.orderList = orderList;
+	}
+
 
 	public User() {
 	}

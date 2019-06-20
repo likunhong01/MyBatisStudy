@@ -24,4 +24,153 @@
         SELECT u.* FROM user u WHERE username LIKE '%${username}%' AND sex = #{sex}
 
     </select>
+
+
+    <!-- ==================第二天内容======================-->
+
+    <!--1 设置返回数据为基本类型,int,double,long,string....-->
+    <!-- 查询用户的个数 -->
+    <select id="findUserCount" parameterType="userQueryVO" resultType="int">
+        SELECT COUNT(*) FROM  user WHERE sex = #{user.sex}
+    </select>
+
+    <!--2.设置返回数据为resultMap -->
+    <resultMap id="userResultMap" type="user">
+        <id property="id" column="id_"></id>
+        <result property="username" column="username_"></result>
+        <result property="sex" column="sex_"></result>
+        <result property="birthday" column="birthday_"></result>
+        <result property="address" column="address_"></result>
+    </resultMap>
+    <select id="findUserByIdResultMap" parameterType="int" resultMap="userResultMap">
+        SELECT
+         id id_,
+         username username_,
+         sex sex_,
+         birthday birthday_,
+         address address_
+        FROM user WHERE id = #{id}
+    </select>
+
+
+    <!-- 3.if和where的使用-->
+    <sql id="select_user_where">
+        <if test="user != null">
+            <if test="user.sex != null and user.sex != ''">
+                sex = #{user.sex}
+            </if>
+            <if test="user.username != null and user.username != ''">
+                and username LIKE '%${user.username}%'
+            </if>
+            <if test="user.address != null and user.address != ''">
+                and address LIKE '%${user.address}%'
+            </if>
+        </if>
+    </sql>
+    <select id="findUserList" parameterType="userQueryVO" resultType="user">
+        /*性别和名字*/
+        SELECT * FROM user
+
+        <where>
+            <include refid="select_user_where"/>
+        </where>
+    </select>
+
+    <!-- 4.foreac使用讲解-->
+    <select id="findUserByIds" parameterType="userQueryVO" resultType="user">
+        <!--性别和名字 SELECT * FROM user WHERE id in (1,2,3) -->
+        SELECT * FROM user
+        <where>
+            <if test="ids != null and ids.size > 0">
+                <!--
+                collection:集合,写集合属性
+                item:遍历接收变量
+                open:遍历开始
+                close：遍历结束
+                separator:拼接格式
+                for(Integer id : ids){
+                }
+                -->
+                <foreach collection="ids" item="id" open="id in(" close=")" separator=",">
+                    ${id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 5.参数是数组
+        如果参数是数组的话，parameterType可以写全名【java.util.List】，也可以写别名
+        遍历或者判断的时候，都用list变量
+    -->
+    <select id="findUserByIds2" parameterType="list" resultType="user">
+        <!--性别和名字 SELECT * FROM user WHERE id in (1,2,3) -->
+        SELECT * FROM user
+        <where>
+            <if test="list != null and list.size > 0">
+                <foreach collection="list" item="id" open="id in(" close=")" separator=",">
+                    ${id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+
+    <!-- ==============查询用户信息及用户购买的商品信息============-->
+    <resultMap id="userRslMap" type="user">
+        <!-- 1.匹配user属性 -->
+        <id column="id" property="id"></id>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+
+        <!--2.匹配user的orderList-->
+        <collection property="orderList" ofType="orders">
+            <id column="order_id" property="id"></id>
+            <result column="number" property="number"/>
+            <result column="createtime" property="createtime"/>
+            <result column="note" property="note"/>
+
+            <!-- 3.匹配Orders里有orderDetails-->
+            <collection property="orderDetails" ofType="orderDetail">
+                <id column="detail_id" property="id"></id>
+                <result column="items_id" property="itemsId"/>
+                <result column="items_num" property="itemsNum"/>
+
+                <!-- 4.配置定单详情的商品信息-->
+                <association property="items" javaType="items">
+                    <id column="items_id" property="id"/>
+                    <result column="name" property="name"/>
+                    <result column="price" property="price"/>
+                    <result column="detail" property="detail"/>
+                </association>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="findUserAndOrderInfo" resultMap="userRslMap">
+        SELECT
+            u.id,
+            u.username,
+            u.address,
+            o.id order_id,
+            o.number,
+            o.createtime,
+            o.note,
+            od.id detail_id,
+            od.items_id,
+            od.items_num,
+            it.name,
+            it.price,
+            it.detail
+        FROM
+            user u,
+            orders o,
+            orderdetail od,
+          items it
+        WHERE
+            o.user_id = u.id
+          AND o.id = od.orders_id
+          AND od.items_id = it.id
+    </select>
 </mapper>
